@@ -34,19 +34,22 @@ class slot:
 
 class FirstFit(BaseAllocator):
     def fit(self, rec) -> int:
+        # new rec params
         start, end, size = rec["start"], rec["end"], rec["size"]
         slots = []
         slots.append(slot(0, self.SRAM))
 
         for _, rec in enumerate(self.rectangles):
+            # rec is considered in rectangles
             if rec["placement"] != -1:  # this each placed rectangle
+                # check if new rec overlaps with any placed tensor in rectangles in terms of lifetime
                 if (
                     start < rec["start"] < end
                     or start < rec["end"] < end
                     or rec["start"] < start < rec["end"]
                     or rec["start"] < end < rec["end"]
                 ):  # overlap with the insert block
-                    # placement of the rectatngle
+                    # placement of the rectangle
                     y0 = rec["placement"]
                     if rec["stride2_inplace_idx"] is not None and start > rec["stride2_inplace_idx"]:
                         y1 = y0 + math.ceil(rec["size"] / 4)

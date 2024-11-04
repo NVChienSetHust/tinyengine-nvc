@@ -196,7 +196,9 @@ class GeneralMemoryScheduler:
                         unallocated_tensors.append(t)
 
             # add each tensor
-            training_start_idx = _find_training_idx(layers=self.layer)
+            training_start_idx = _find_training_idx(self.layer)
+            #TODO: this is just the dirty fix for modify last 2 with gradfilt
+            # training_start_idx = _find_training_idx_gf_last_2(self.layer)
             for cnt, t in enumerate(unallocated_tensors):
                 start_idx = i
                 # TODO: this is temp solution
@@ -284,7 +286,10 @@ class GeneralMemoryScheduler:
         # we need to figure out training_weight and training_activation here
         # for training_weight, it should contain weights of "transpose conv"
         # then, other tensors in training can be categorized as training activation
-        training_start_idx = _find_training_idx(self.layer)
+        # training_start_idx = _find_training_idx(self.layer)
+        #TODO: this is just the dirty fix for reordering the gradfilt operator of last 2 with gradfilt
+        training_start_idx = _find_training_idx_gf_last_2(self.layer)
+
         # assign every tenosrs labeled as TTYPE_INFERNECE after the index as TTYPE_TRAINING_ACTIVATION
         for r in self.allocator.rectangles:
             if r["type"] == TTYPE_INFERNECE and r["end"] > training_start_idx:
@@ -520,3 +525,15 @@ def _find_training_idx(layers):
         if l.params["op"] in ["CAST"]:
             return cnt
     return idx
+
+def _find_training_idx_gf_last_2(layers):
+    idx = len(layers)  # Initialize idx with the total number of layers
+    cast_count = 0  # Counter for occurrences of "CAST"
+    
+    for cnt, l in enumerate(layers):  # Iterate over the layers with their indices
+        if l.params["op"] == "CAST":  # Check if the operation type is "CAST"
+            cast_count += 1  # Increment the count
+            if cast_count == 2:  # If we find the second occurrence
+                return cnt  # Return the index of the second "CAST" layer
+    
+    return idx  # Return the total number of layers if no second "CAST" is found

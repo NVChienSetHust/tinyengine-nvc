@@ -456,7 +456,7 @@ def _updateOutputDtype(layer, origin_idx, type):
 
 def _findConv2dwithScaleName(model, layers, scale_idx):
     for _, op in enumerate(model):
-        if op["type"] == "nn.mcuconv2d":
+        if op["type"] == "nn.mcuconv2d" or op["type"] == "nn.mcuconv2davg":
             if _findKeyinTensors(op["inputs"], "scale")["name"] == scale_idx:
                 # find the layer
                 for layer in layers:

@@ -36,7 +36,7 @@ from .FusionUtil import (
     _updateIdxParameter,
     _updateOutputDtype,
 )
-from .GraphReorder import reorderGroupConv_TransponseConv, reorderGroupConv_TransponseConv_int8
+from .GraphReorder import reorderGroupConv_TransponseConv, reorderGroupConv_TransponseConv_int8, reorderAvgPool2dGradFilt
 from .operators import (
     add,
     add1d,
@@ -149,11 +149,14 @@ class TTEParser(object):
         self.fusedInputTable[self.model[0]["inputs"][0]["name"]] = self.model[0]["inputs"][0]["name"]
         # reorder the group conv and transpose conv to calculate weight gradients first
         if FUSHION_CONFIG[REORDER_STR]:
+            # use the following function to reorder the average pooling function of gradient filtering technique in computation graph
+            self.model = reorderAvgPool2dGradFilt(self.model)
+
             self.model = reorderGroupConv_TransponseConv(self.model)
             self.model = reorderGroupConv_TransponseConv_int8(self.model)
         for cnt, op in enumerate(self.model):
             op_type = op["type"]
-            if op_type in {"nn.conv2d", "nn.mcuconv2d"}:
+            if op_type in {"nn.conv2d", "nn.mcuconv2d", "nn.mcuconv2davg"}:
                 last_op = self._convert_convolution(op)
                 # Float bp fusion
                 # check if we need to have binary mask for this conv2d
@@ -534,9 +537,12 @@ class TTEParser(object):
                             self.outputTables.append(outputInfo(name, idx, int(length), dtype))
                     else:
                         raise NotImplementedError
-
+            elif op_type == "nn.avg_pool2d":
+                last_op = self._convert_average_pool(op)
+                self.layer.append(last_op)
             else:
                 warnings.warn("%s op is not `supported" % op_type)
+                print(op_type)
                 raise NotImplementedError
 
             # GROUP CONV
