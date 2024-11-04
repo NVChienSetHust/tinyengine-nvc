@@ -32,6 +32,14 @@ typedef enum {
 #define TN_MAX(A,B) ((A) > (B) ? (A) : (B))
 #define TN_MIN(A,B) ((A) < (B) ? (A) : (B))
 
+tinyengine_status_fp group_conv_fp_kernel2_stride1_pad0_in2x2_out1x1_uniweight_4row16col_inplace(const float* input_data, 
+                 const uint16_t input_height, const uint16_t input_width, const uint16_t input_depth, 
+                 const float* filter_data, const float* bias_data, 
+                 int8_t* output_weight_data, const uint16_t output_height, const uint16_t output_width, const uint16_t output_depth, 
+                 const float output_activation_min, const float output_activation_max,
+                 float* im2col_data, const uint16_t batches, const uint16_t groups,
+                 const float* scales, const float learning_rate);
+
 tinyengine_status_fp add_fp(const uint16_t size, const float* input1_data,
 		const float* input2_data, float* output_data);
 
