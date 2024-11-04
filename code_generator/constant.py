@@ -47,6 +47,16 @@ FUSHION_CONFIG = {
     INPLACE_MUL_STR: True,
     REORDER_STR: True,
     INPLACE_DEPTHWISE_STRIDE2_STR: True,
+    # set constants value to observe the memory footprint of non-optimized graph
+    # FUSE_TILE_STR: False,
+    # FUSE_INT8CAST_STR: False,
+    # FUSE_INT8CASTSLICE_STR: False,
+    # FUSE_SGD_UPDATE_STR: False,
+    # FUSE_WHERE_ZEROSSTR: False,
+    # INPLACE_WHERE_STR: False,
+    # INPLACE_MUL_STR: False,
+    # REORDER_STR: False,
+    # INPLACE_DEPTHWISE_STRIDE2_STR: False,
 }
 INFERECE_WEIGHT_SIZE = 1
 INFERECE_INT8_SIZE = 1
@@ -82,6 +92,7 @@ FIGURE_CONFIG = {
 op_name_translation = {
     "nn.conv2d": ["CONV_2D", "DEPTHWISE_CONV_2D", "GROUP_CONV"],
     "nn.mcuconv2d": ["CONV_2D", "DEPTHWISE_CONV_2D", "GROUP_CONV"],
+    "nn.mcuconv2davg": ["CONV_2D", "DEPTHWISE_CONV_2D", "GROUP_CONV"],
     "nn.mcuadd": "ADD",
     "nn.dense": "DENSE",
     "nn.matmul": "MAT_MUL",
