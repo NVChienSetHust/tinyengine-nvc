@@ -282,9 +282,11 @@ class groupConv2d(basicOperator):
             else:
                 raise NotImplementedError
 
-            # int8 input for inplace cast
-            if params["input_dtype"] == "int8":
-                function_name += "_int8input"
+            # TODO: currently dont need this because the getbufferstr function automatically cast the buffer to float
+            # # int8 input for inplace cast
+            # if params["input_dtype"] == "int8":
+            #     function_name += "_int8input"
+
 
             if not params["float32_input2"]:
                 function_name += "_int8weight"
