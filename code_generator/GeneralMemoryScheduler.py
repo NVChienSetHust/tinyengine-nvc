@@ -197,8 +197,7 @@ class GeneralMemoryScheduler:
 
             # add each tensor
             training_start_idx = _find_training_idx(self.layer)
-            #TODO: this is just the dirty fix for modify last 2 with gradfilt
-            # training_start_idx = _find_training_idx_gf_last_2(self.layer)
+
             for cnt, t in enumerate(unallocated_tensors):
                 start_idx = i
                 # TODO: this is temp solution
@@ -286,9 +285,11 @@ class GeneralMemoryScheduler:
         # we need to figure out training_weight and training_activation here
         # for training_weight, it should contain weights of "transpose conv"
         # then, other tensors in training can be categorized as training activation
-        # training_start_idx = _find_training_idx(self.layer)
-        #TODO: this is just the dirty fix for reordering the gradfilt operator of last 2 with gradfilt
-        training_start_idx = _find_training_idx_gf_last_2(self.layer)
+        training_start_idx = _find_training_idx(self.layer)
+
+        #TODO: this is just the dirty fix for reordering the gradfilt operator of last 2 with gradfilt 
+        # uncomment the following function and comment the previous _finc_training_idx function to have an accurate visualization of GF fine-tuning graph
+        # training_start_idx = _find_training_idx_gf_last_2(self.layer)
 
         # assign every tenosrs labeled as TTYPE_INFERNECE after the index as TTYPE_TRAINING_ACTIVATION
         for r in self.allocator.rectangles:
